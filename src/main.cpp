@@ -1,24 +1,27 @@
 #include "com_port.hpp"
 #include "logger.hpp"
 #include <vector>
-#include <numeric> 
+#include <numeric>
 #include <iostream>
 
 #ifdef _WIN32
-#include <windows.h> 
+#include <windows.h>
 #else
 #include <thread>
-#include <chrono> 
+#include <chrono>
 #endif
 
 int main() {
     try {
+#ifdef _WIN32
         COMPort com_port("COM3");
+#else
+        COMPort com_port("/dev/ttyS2");
+#endif
         Logger logger;
         int interval = 1;
         std::vector<float> measurementsAll;
         std::vector<float> measurementsHourly;
-
 
         while (true) {
             std::string data = com_port.readData();

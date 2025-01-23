@@ -6,6 +6,12 @@
 
 #include "com_port.hpp"
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
 class MockDevice {
 public:
     MockDevice(const std::string& port_name) : comPort_(port_name) {
@@ -17,7 +23,11 @@ public:
             float temperature = generateRandomTemperature();
             sendTemperatureToHost(temperature);
 
+#ifdef _WIN32
             Sleep(1000);
+#else
+            usleep(1000000);
+#endif
         }
     }
 
@@ -44,7 +54,11 @@ private:
 
 int main() {
     try {
+#ifdef _WIN32
         MockDevice mock_device("COM4");
+#else
+        MockDevice mock_device("/dev/ttyS3");
+#endif
         mock_device.run();
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;

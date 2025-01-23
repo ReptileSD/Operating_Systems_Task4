@@ -10,6 +10,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <direct.h> // Для _mkdir
 #else
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -48,9 +49,13 @@ public:
 private:
     void createLogDirectory(const std::string& directory) {
 #ifdef _WIN32
-        CreateDirectoryA(directory.c_str(), nullptr);
+        if (_mkdir(directory.c_str()) != 0 && errno != EEXIST) {
+            std::cerr << "Failed to create log directory: " << directory << std::endl;
+        }
 #else
-        mkdir(directory.c_str(), 0777);
+        if (mkdir(directory.c_str(), 0777) != 0 && errno != EEXIST) {
+            std::cerr << "Failed to create log directory: " << directory << std::endl;
+        }
 #endif
     }
 
